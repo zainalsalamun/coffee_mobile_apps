@@ -1,17 +1,10 @@
 import 'package:flutter/material.dart';
 
-// ======================================================================
-//  REUSABLE SEARCH BAR
-// ======================================================================
 class AppSearchBar extends StatelessWidget {
   final String hint;
   final TextEditingController? controller;
 
-  const AppSearchBar({
-    super.key,
-    required this.hint,
-    this.controller,
-  });
+  const AppSearchBar({super.key, required this.hint, this.controller});
 
   @override
   Widget build(BuildContext context) {
@@ -32,11 +25,7 @@ class AppSearchBar extends StatelessWidget {
           border: InputBorder.none,
           focusedBorder: InputBorder.none,
           enabledBorder: InputBorder.none,
-          prefixIcon: const Icon(
-            Icons.search,
-            size: 20,
-            color: Colors.black54,
-          ),
+          prefixIcon: const Icon(Icons.search, size: 20, color: Colors.black54),
           hintText: hint,
           hintStyle: const TextStyle(
             fontFamily: 'Georgia',
@@ -51,18 +40,11 @@ class AppSearchBar extends StatelessWidget {
   }
 }
 
-// ======================================================================
-//  REUSABLE ITEM CARD
-// ======================================================================
 class AppItemCard extends StatelessWidget {
   final String image;
   final String name;
 
-  const AppItemCard({
-    super.key,
-    required this.image,
-    required this.name,
-  });
+  const AppItemCard({super.key, required this.image, required this.name});
 
   @override
   Widget build(BuildContext context) {
@@ -74,12 +56,7 @@ class AppItemCard extends StatelessWidget {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Image.asset(
-            image,
-            width: 100,
-            height: 100,
-            fit: BoxFit.contain,
-          ),
+          Image.asset(image, width: 100, height: 100, fit: BoxFit.contain),
           const SizedBox(height: 10),
           Text(
             name,
@@ -96,9 +73,6 @@ class AppItemCard extends StatelessWidget {
   }
 }
 
-// ======================================================================
-//  MAIN PAGE — EQUIPMENT PAGE
-// ======================================================================
 class EquipmentPage extends StatelessWidget {
   const EquipmentPage({super.key});
 
@@ -107,7 +81,6 @@ class EquipmentPage extends StatelessWidget {
     return Scaffold(
       body: Stack(
         children: [
-          // Background
           SizedBox(
             width: double.infinity,
             height: double.infinity,
@@ -123,7 +96,6 @@ class EquipmentPage extends StatelessWidget {
               children: [
                 const SizedBox(height: 12),
 
-                // ===== BACK + SEARCH BAR =====
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 16),
                   child: Row(
@@ -145,10 +117,7 @@ class EquipmentPage extends StatelessWidget {
                       ),
                       const SizedBox(width: 12),
 
-                      // Search bar reusable
-                      const Expanded(
-                        child: AppSearchBar(hint: "Cari..."),
-                      ),
+                      const Expanded(child: AppSearchBar(hint: "Cari...")),
                     ],
                   ),
                 ),
@@ -167,7 +136,6 @@ class EquipmentPage extends StatelessWidget {
 
                 const SizedBox(height: 20),
 
-                // ===== GRID LIST =====
                 Expanded(
                   child: Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -175,12 +143,12 @@ class EquipmentPage extends StatelessWidget {
                       padding: const EdgeInsets.only(bottom: 80),
                       itemCount: equipmentList.length,
                       gridDelegate:
-                      const SliverGridDelegateWithFixedCrossAxisCount(
-                        crossAxisCount: 2,
-                        childAspectRatio: 0.88,
-                        mainAxisSpacing: 18,
-                        crossAxisSpacing: 18,
-                      ),
+                          const SliverGridDelegateWithFixedCrossAxisCount(
+                            crossAxisCount: 2,
+                            childAspectRatio: 0.88,
+                            mainAxisSpacing: 18,
+                            crossAxisSpacing: 18,
+                          ),
                       itemBuilder: (context, index) {
                         final item = equipmentList[index];
                         return AppItemCard(
@@ -192,10 +160,11 @@ class EquipmentPage extends StatelessWidget {
                   ),
                 ),
 
-                // ===== TOMBOL TAMBAH & PILIH =====
                 Padding(
-                  padding:
-                  const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 20,
+                    vertical: 10,
+                  ),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: const [
@@ -227,17 +196,14 @@ class EquipmentPage extends StatelessWidget {
   }
 }
 
-// ======================================================================
-//  LIST DATA
-// ======================================================================
 final List<Map<String, dynamic>> equipmentList = [
   {
     "image": "assets/equip/manual_espresso.png",
-    "name": "Manual Espresso\nMachine"
+    "name": "Manual Espresso\nMachine",
   },
   {
     "image": "assets/equip/manual_espresso2.png",
-    "name": "Manual Espresso\nMachine"
+    "name": "Manual Espresso\nMachine",
   },
   {"image": "assets/equip/grinder.png", "name": "Grinder"},
   {"image": "assets/equip/milk_frother.png", "name": "Milk Frother"},

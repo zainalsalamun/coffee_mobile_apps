@@ -8,7 +8,6 @@ class PersediaanPage extends StatelessWidget {
     return Scaffold(
       body: Stack(
         children: [
-          // Background
           SizedBox(
             width: double.infinity,
             height: double.infinity,
@@ -24,7 +23,6 @@ class PersediaanPage extends StatelessWidget {
               children: [
                 const SizedBox(height: 12),
 
-                // ========== BACK BUTTON + SEARCH BAR ==========
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 16),
                   child: Row(
@@ -46,16 +44,13 @@ class PersediaanPage extends StatelessWidget {
                       ),
                       const SizedBox(width: 12),
 
-                      const Expanded(
-                        child: AppSearchBar(hint: "Cari..."),
-                      ),
+                      const Expanded(child: AppSearchBar(hint: "Cari...")),
                     ],
                   ),
                 ),
 
                 const SizedBox(height: 20),
 
-                // ========== TITLE ==========
                 const Text(
                   "Persediaan",
                   style: TextStyle(
@@ -68,7 +63,6 @@ class PersediaanPage extends StatelessWidget {
 
                 const SizedBox(height: 20),
 
-                // ========== GRID ==========
                 Expanded(
                   child: Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -76,12 +70,12 @@ class PersediaanPage extends StatelessWidget {
                       padding: const EdgeInsets.only(bottom: 80),
                       itemCount: persediaanList.length,
                       gridDelegate:
-                      const SliverGridDelegateWithFixedCrossAxisCount(
-                        crossAxisCount: 2,
-                        childAspectRatio: 0.88,
-                        mainAxisSpacing: 18,
-                        crossAxisSpacing: 18,
-                      ),
+                          const SliverGridDelegateWithFixedCrossAxisCount(
+                            crossAxisCount: 2,
+                            childAspectRatio: 0.88,
+                            mainAxisSpacing: 18,
+                            crossAxisSpacing: 18,
+                          ),
                       itemBuilder: (context, index) {
                         final item = persediaanList[index];
                         return AppItemCard(
@@ -93,10 +87,11 @@ class PersediaanPage extends StatelessWidget {
                   ),
                 ),
 
-                // ========== BOTTOM ACTION ==========
                 Padding(
-                  padding:
-                  const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 20,
+                    vertical: 10,
+                  ),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: const [
@@ -128,20 +123,11 @@ class PersediaanPage extends StatelessWidget {
   }
 }
 
-//
-// ===============================================================
-//  SINGLE CLASS: ITEM CARD (KHUSUS PERSEDIAAN)
-// ===============================================================
-//
 class AppItemCard extends StatelessWidget {
   final String image;
   final String name;
 
-  const AppItemCard({
-    super.key,
-    required this.image,
-    required this.name,
-  });
+  const AppItemCard({super.key, required this.image, required this.name});
 
   @override
   Widget build(BuildContext context) {
@@ -153,12 +139,7 @@ class AppItemCard extends StatelessWidget {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Image.asset(
-            image,
-            width: 100,
-            height: 100,
-            fit: BoxFit.contain,
-          ),
+          Image.asset(image, width: 100, height: 100, fit: BoxFit.contain),
           const SizedBox(height: 10),
           Text(
             name,
@@ -175,20 +156,11 @@ class AppItemCard extends StatelessWidget {
   }
 }
 
-//
-// ===============================================================
-//  SINGLE CLASS: SEARCH BAR (REUSABLE & CLEAN)
-// ===============================================================
-//
 class AppSearchBar extends StatelessWidget {
   final String hint;
   final TextEditingController? controller;
 
-  const AppSearchBar({
-    super.key,
-    required this.hint,
-    this.controller,
-  });
+  const AppSearchBar({super.key, required this.hint, this.controller});
 
   @override
   Widget build(BuildContext context) {
@@ -209,11 +181,7 @@ class AppSearchBar extends StatelessWidget {
           border: InputBorder.none,
           focusedBorder: InputBorder.none,
           enabledBorder: InputBorder.none,
-          prefixIcon: const Icon(
-            Icons.search,
-            size: 20,
-            color: Colors.black54,
-          ),
+          prefixIcon: const Icon(Icons.search, size: 20, color: Colors.black54),
           hintText: hint,
           hintStyle: const TextStyle(
             fontFamily: 'Georgia',
@@ -228,11 +196,6 @@ class AppSearchBar extends StatelessWidget {
   }
 }
 
-//
-// ===============================================================
-//  LIST DATA PERSEDIAAN
-// ===============================================================
-//
 final List<Map<String, dynamic>> persediaanList = [
   {"image": "assets/stock/bubuk_kopi.png", "name": "Bubuk Kopi"},
   {"image": "assets/stock/susu.png", "name": "Susu"},

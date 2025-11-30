@@ -1,11 +1,10 @@
-// lib/core/theme/app_text_styles.dart
 import 'package:flutter/material.dart';
 import 'app_colors.dart';
 
 class AppTextStyles {
   AppTextStyles._();
 
-  static const String _fontFamily = 'Inter'; // sesuaikan dengan font-mu
+  static const String _fontFamily = 'Inter';
 
   static const TextStyle titleLarge = TextStyle(
     fontFamily: _fontFamily,

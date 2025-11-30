@@ -8,26 +8,14 @@ class RegisterPage extends StatelessWidget {
     return Scaffold(
       body: Stack(
         children: [
-          // ==========================
-          // BACKGROUND IMAGE
-          // ==========================
           SizedBox(
             width: double.infinity,
             height: double.infinity,
-            child: Image.asset(
-              'assets/images/caffe_bg.png',
-              fit: BoxFit.cover,
-            ),
+            child: Image.asset('assets/images/caffe_bg.png', fit: BoxFit.cover),
           ),
 
-          // dark overlay
-          Container(
-            color: Colors.black.withOpacity(0.25),
-          ),
+          Container(color: Colors.black.withOpacity(0.25)),
 
-          // ==========================
-          // BACK BUTTON
-          // ==========================
           SafeArea(
             child: Padding(
               padding: const EdgeInsets.only(left: 16, top: 10),
@@ -49,9 +37,6 @@ class RegisterPage extends StatelessWidget {
             ),
           ),
 
-          // ==========================
-          // CONTENT
-          // ==========================
           SingleChildScrollView(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -84,9 +69,6 @@ class RegisterPage extends StatelessWidget {
 
                       const SizedBox(height: 35),
 
-                      // ==========================
-                      // USERNAME FIELD
-                      // ==========================
                       Container(
                         decoration: BoxDecoration(
                           color: const Color(0xFFC2A6A6),
@@ -116,9 +98,6 @@ class RegisterPage extends StatelessWidget {
 
                       const SizedBox(height: 20),
 
-                      // ==========================
-                      // PASSWORD FIELD
-                      // ==========================
                       Container(
                         decoration: BoxDecoration(
                           color: const Color(0xFFC2A6A6),
@@ -149,9 +128,6 @@ class RegisterPage extends StatelessWidget {
 
                       const SizedBox(height: 20),
 
-                      // ==========================
-                      // CONFIRM PASSWORD
-                      // ==========================
                       Container(
                         decoration: BoxDecoration(
                           color: const Color(0xFFC2A6A6),
@@ -182,7 +158,6 @@ class RegisterPage extends StatelessWidget {
 
                       const SizedBox(height: 30),
 
-                      // REGISTER BUTTON
                       SizedBox(
                         width: double.infinity,
                         height: 48,

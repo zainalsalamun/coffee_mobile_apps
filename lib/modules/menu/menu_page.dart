@@ -8,31 +8,22 @@ class MenuPage extends StatelessWidget {
     return Scaffold(
       body: Stack(
         children: [
-          // ==========================
-          // BACKGROUND IMAGE
-          // ==========================
           SizedBox(
             width: double.infinity,
             height: double.infinity,
             child: Image.asset(
-              'assets/images/bg_coffee_menu.png', // ganti sesuai aset
+              'assets/images/bg_coffee_menu.png',
               fit: BoxFit.cover,
             ),
           ),
 
           Container(color: Colors.black.withOpacity(0.10)),
 
-          // ==========================
-          // CONTENT
-          // ==========================
           SafeArea(
             child: Column(
               children: [
                 const SizedBox(height: 12),
 
-                // ==========================
-                // BACK BUTTON + SEARCH BAR
-                // ==========================
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 16),
                   child: Row(
@@ -54,8 +45,6 @@ class MenuPage extends StatelessWidget {
                       ),
 
                       const SizedBox(width: 12),
-
-                      // =============== SEARCH BAR FIX ===============
                       Expanded(
                         child: Container(
                           height: 44,
@@ -100,7 +89,6 @@ class MenuPage extends StatelessWidget {
 
                 const SizedBox(height: 20),
 
-                // TITLE
                 const Text(
                   "Menu",
                   style: TextStyle(
@@ -113,21 +101,18 @@ class MenuPage extends StatelessWidget {
 
                 const SizedBox(height: 20),
 
-                // ==========================
-                // GRID MENU
-                // ==========================
                 Expanded(
                   child: Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 20),
                     child: GridView.builder(
                       padding: const EdgeInsets.only(bottom: 80),
                       gridDelegate:
-                      const SliverGridDelegateWithFixedCrossAxisCount(
-                        crossAxisCount: 2,
-                        childAspectRatio: 0.88,
-                        crossAxisSpacing: 18,
-                        mainAxisSpacing: 18,
-                      ),
+                          const SliverGridDelegateWithFixedCrossAxisCount(
+                            crossAxisCount: 2,
+                            childAspectRatio: 0.88,
+                            crossAxisSpacing: 18,
+                            mainAxisSpacing: 18,
+                          ),
                       itemCount: menuList.length,
                       itemBuilder: (context, index) {
                         final item = menuList[index];
@@ -137,12 +122,11 @@ class MenuPage extends StatelessWidget {
                   ),
                 ),
 
-                // ==========================
-                // BOTTOM ACTIONS
-                // ==========================
                 Padding(
-                  padding:
-                  const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 20,
+                    vertical: 10,
+                  ),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: const [
@@ -173,9 +157,6 @@ class MenuPage extends StatelessWidget {
     );
   }
 
-  // ==========================
-  // MENU ITEM CARD
-  // ==========================
   Widget _menuItem(String img, String name) {
     return Container(
       decoration: BoxDecoration(
@@ -185,12 +166,7 @@ class MenuPage extends StatelessWidget {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Image.asset(
-            img,
-            width: 82,
-            height: 82,
-            fit: BoxFit.contain,
-          ),
+          Image.asset(img, width: 82, height: 82, fit: BoxFit.contain),
           const SizedBox(height: 10),
           Text(
             name,
@@ -206,9 +182,6 @@ class MenuPage extends StatelessWidget {
   }
 }
 
-// ==========================
-// MENU DATA LIST
-// ==========================
 final List<Map<String, dynamic>> menuList = [
   {"image": "assets/menu/espresso.png", "name": "Espresso"},
   {"image": "assets/menu/americano.png", "name": "Americano"},

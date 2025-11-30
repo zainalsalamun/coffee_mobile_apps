@@ -15,26 +15,23 @@ class HomePage extends StatelessWidget {
           padding: const EdgeInsets.only(bottom: 30),
           child: Column(
             children: [
-              // ===========================
-              // HEADER BAR
-              // ===========================
               Container(
                 width: double.infinity,
-                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
-                decoration: BoxDecoration(
-                  color: maroon,
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 20,
+                  vertical: 14,
                 ),
+                decoration: BoxDecoration(color: maroon),
                 child: GestureDetector(
                   onTap: () {
                     Navigator.pushNamed(context, '/edit-profile');
                   },
                   child: Row(
                     children: [
-                      // Avatar
                       ClipRRect(
                         borderRadius: BorderRadius.circular(25),
                         child: Image.asset(
-                          'assets/images/user.png', // <-- ganti foto profil
+                          'assets/images/user.png',
                           width: 40,
                           height: 40,
                           fit: BoxFit.cover,
@@ -75,7 +72,11 @@ class HomePage extends StatelessWidget {
                           color: Colors.white24,
                           borderRadius: BorderRadius.circular(30),
                         ),
-                        child: const Icon(Icons.settings, color: Colors.white, size: 22),
+                        child: const Icon(
+                          Icons.settings,
+                          color: Colors.white,
+                          size: 22,
+                        ),
                       ),
                     ],
                   ),
@@ -84,9 +85,6 @@ class HomePage extends StatelessWidget {
 
               const SizedBox(height: 20),
 
-              // ===========================
-              // CARD - MENU
-              // ===========================
               _menuCard(
                 icon: Icons.coffee,
                 label: "Menu",
@@ -94,42 +92,29 @@ class HomePage extends StatelessWidget {
                 onTap: () {
                   Navigator.pushNamed(context, '/menu');
                 },
-
               ),
 
               const SizedBox(height: 14),
 
-              // ===========================
-              // CARD IMAGE (BUT FIRST COFFEE)
-              // ===========================
               _imageCard("assets/images/but_first_coffee.png"),
 
               const SizedBox(height: 14),
 
-              // ===========================
-              // CARD - Peralatan dan Mesin
-              // ===========================
               _menuCard(
                 icon: Icons.kitchen,
                 label: "Peralatan dan Mesin",
                 bgColor: maroonDark,
                 onTap: () {
-                    Navigator.pushNamed(context, '/equipment');
+                  Navigator.pushNamed(context, '/equipment');
                 },
               ),
 
               const SizedBox(height: 14),
 
-              // ===========================
-              // CARD INFO TEXT
-              // ===========================
               _infoTextCard(),
 
               const SizedBox(height: 14),
 
-              // ===========================
-              // CARD - Persediaan
-              // ===========================
               _menuCard(
                 icon: Icons.inventory_2,
                 label: "Persediaan",
@@ -141,9 +126,6 @@ class HomePage extends StatelessWidget {
 
               const SizedBox(height: 14),
 
-              // ===========================
-              // CARD IMAGE BAWAH
-              // ===========================
               _imageCard("assets/images/coffe_cup.png"),
             ],
           ),
@@ -152,9 +134,6 @@ class HomePage extends StatelessWidget {
     );
   }
 
-  // ===========================
-  // WIDGET MENU CARD
-  // ===========================
   Widget _menuCard({
     required IconData icon,
     required String label,
@@ -175,11 +154,7 @@ class HomePage extends StatelessWidget {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Icon(
-                  icon,
-                  color: Colors.white,
-                  size: 28,
-                ),
+                Icon(icon, color: Colors.white, size: 28),
                 const SizedBox(height: 8),
                 Text(
                   label,
@@ -198,21 +173,13 @@ class HomePage extends StatelessWidget {
     );
   }
 
-
-
-  // ===========================
-  // WIDGET IMAGE CARD
-  // ===========================
   Widget _imageCard(String path) {
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 20),
       height: 130,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(18),
-        image: DecorationImage(
-          image: AssetImage(path),
-          fit: BoxFit.cover,
-        ),
+        image: DecorationImage(image: AssetImage(path), fit: BoxFit.cover),
       ),
       child: Stack(
         children: [
@@ -233,9 +200,6 @@ class HomePage extends StatelessWidget {
     );
   }
 
-  // ===========================
-  // WIDGET TEXT INFO CARD
-  // ===========================
   Widget _infoTextCard() {
     return Container(
       width: double.infinity,

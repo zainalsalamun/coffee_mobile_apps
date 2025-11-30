@@ -18,16 +18,13 @@ class EditProfilePage extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // ===========================
-                  // AVATAR
-                  // ===========================
                   Center(
                     child: Column(
                       children: [
                         ClipRRect(
                           borderRadius: BorderRadius.circular(60),
                           child: Image.asset(
-                            "assets/images/user.png", // Ganti sesuai assetmu
+                            "assets/images/user.png",
                             width: 95,
                             height: 95,
                             fit: BoxFit.cover,
@@ -38,9 +35,6 @@ class EditProfilePage extends StatelessWidget {
                     ),
                   ),
 
-                  // ===========================
-                  // Nama
-                  // ===========================
                   const Text(
                     "Nama",
                     style: TextStyle(
@@ -55,9 +49,6 @@ class EditProfilePage extends StatelessWidget {
                   _textFieldBox(value: "Johnny"),
                   const SizedBox(height: 20),
 
-                  // ===========================
-                  // Jabatan
-                  // ===========================
                   const Text(
                     "Jabatan",
                     style: TextStyle(
@@ -72,9 +63,6 @@ class EditProfilePage extends StatelessWidget {
                   _textFieldBox(value: "Admin"),
                   const SizedBox(height: 20),
 
-                  // ===========================
-                  // Password
-                  // ===========================
                   const Text(
                     "Password",
                     style: TextStyle(
@@ -89,9 +77,6 @@ class EditProfilePage extends StatelessWidget {
                   _textFieldBox(value: "********", obscure: true),
                   const SizedBox(height: 30),
 
-                  // ===========================
-                  // Pengguna Lain
-                  // ===========================
                   const Text(
                     "Pengguna Lain:",
                     style: TextStyle(
@@ -119,7 +104,6 @@ class EditProfilePage extends StatelessWidget {
 
                   const SizedBox(height: 18),
 
-                  // Tambah - Pilih
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: const [
@@ -145,9 +129,6 @@ class EditProfilePage extends StatelessWidget {
               ),
             ),
 
-            // ===========================
-            // EDIT BUTTON (BOTTOM)
-            // ===========================
             Positioned(
               bottom: 26,
               left: 0,
@@ -179,9 +160,6 @@ class EditProfilePage extends StatelessWidget {
               ),
             ),
 
-            // ===========================
-            // BACK BUTTON (BOTTOM LEFT)
-            // ===========================
             Positioned(
               bottom: 23,
               left: 20,
@@ -203,13 +181,7 @@ class EditProfilePage extends StatelessWidget {
     );
   }
 
-  // ===========================
-  // TEXT FIELD BOX (Sesuai desain asli)
-  // ===========================
-  Widget _textFieldBox({
-    required String value,
-    bool obscure = false,
-  }) {
+  Widget _textFieldBox({required String value, bool obscure = false}) {
     return Container(
       height: 44,
       decoration: BoxDecoration(
@@ -218,7 +190,7 @@ class EditProfilePage extends StatelessWidget {
         border: Border.all(color: Color(0xFFE6E6E6), width: 1),
       ),
       child: Material(
-        color: Colors.transparent, // HAPUS background item bawaan
+        color: Colors.transparent,
         child: TextField(
           controller: TextEditingController(text: value),
           obscureText: obscure,
@@ -231,17 +203,13 @@ class EditProfilePage extends StatelessWidget {
             border: InputBorder.none,
             isCollapsed: true,
             contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 12),
-            filled: false, // HAPUS background bawaan
+            filled: false,
           ),
         ),
       ),
     );
   }
 
-
-  // ===========================
-  // PENGGUNA LAIN TILE
-  // ===========================
   Widget _otherUserTile({
     required String avatar,
     required String name,
@@ -297,11 +265,7 @@ class EditProfilePage extends StatelessWidget {
               color: maroon,
               borderRadius: BorderRadius.circular(20),
             ),
-            child: const Icon(
-              Icons.settings,
-              size: 16,
-              color: Colors.white,
-            ),
+            child: const Icon(Icons.settings, size: 16, color: Colors.white),
           ),
         ],
       ),

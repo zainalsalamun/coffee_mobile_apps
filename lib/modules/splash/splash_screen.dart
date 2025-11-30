@@ -25,7 +25,7 @@ class _SplashPageState extends State<SplashPage> {
         width: double.infinity,
         height: double.infinity,
         decoration: const BoxDecoration(
-          color: Color(0xFF522A2A), // maroon warna tema
+          color: Color(0xFF522A2A),
           image: DecorationImage(
             image: AssetImage('assets/images/caffe_bg.png'),
             fit: BoxFit.cover,

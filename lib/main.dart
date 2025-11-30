@@ -24,21 +24,18 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       theme: AppTheme.dark(),
 
-      // 👇 MULAI DARI SPLASH
       initialRoute: '/',
 
-        routes: {
-          '/': (context) => const SplashPage(),
-          '/login': (context) => const LoginPage(),
-          '/register': (context) => const RegisterPage(),
-          '/home': (context) => const HomePage(),
-          '/edit-profile': (context) => const EditProfilePage(),
-            '/menu': (context) => const MenuPage(),
-          '/equipment': (context) => const EquipmentPage(),
-          '/persediaan': (context) => const PersediaanPage(),
-
-        }
-
+      routes: {
+        '/': (context) => const SplashPage(),
+        '/login': (context) => const LoginPage(),
+        '/register': (context) => const RegisterPage(),
+        '/home': (context) => const HomePage(),
+        '/edit-profile': (context) => const EditProfilePage(),
+        '/menu': (context) => const MenuPage(),
+        '/equipment': (context) => const EquipmentPage(),
+        '/persediaan': (context) => const PersediaanPage(),
+      },
     );
   }
 }

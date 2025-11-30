@@ -1,5 +1,3 @@
-// lib/core/theme/app_spacing.dart
-
 class AppSpacing {
   AppSpacing._();
 

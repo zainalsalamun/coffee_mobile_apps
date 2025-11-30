@@ -1,12 +1,10 @@
-// lib/core/theme/app_colors.dart
 import 'package:flutter/material.dart';
 
 class AppColors {
   AppColors._();
 
-  // Background
-  static const Color bg = Color(0xFF0F0F0F);        // background utama
-  static const Color bgCard = Color(0xFF1A1A1A);    // card/menu
+  static const Color bg = Color(0xFF0F0F0F); // background utama
+  static const Color bgCard = Color(0xFF1A1A1A); // card/menu
   static const Color bgElevated = Color(0xFF171717);
 
   // Primary Accent (biru dari design)
