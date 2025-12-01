@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:coffe_mobile_apps/services/auth_services.dart';
 import 'package:flutter/material.dart';
 
 class SplashPage extends StatefulWidget {
@@ -9,12 +10,19 @@ class SplashPage extends StatefulWidget {
 }
 
 class _SplashPageState extends State<SplashPage> {
+  final _auth = AuthService();
+
   @override
   void initState() {
     super.initState();
+    Future.delayed(const Duration(seconds: 2), () {
+      final user = _auth.currentUser;
 
-    Timer(const Duration(seconds: 2), () {
-      Navigator.pushReplacementNamed(context, '/login');
+      if (user != null) {
+        Navigator.pushReplacementNamed(context, '/home');
+      } else {
+        Navigator.pushReplacementNamed(context, '/login');
+      }
     });
   }
 
