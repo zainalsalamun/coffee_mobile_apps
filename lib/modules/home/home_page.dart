@@ -1,13 +1,19 @@
 import 'package:flutter/material.dart';
+import 'package:coffe_mobile_apps/services/auth_services.dart';
+import '../../models/user.dart';
 
 class HomePage extends StatelessWidget {
-  const HomePage({super.key});
+  HomePage({super.key});
 
   final Color maroon = const Color(0xFF5C2A2A);
   final Color maroonDark = const Color(0xFF4A2020);
 
+  final AuthService _auth = AuthService();
+
   @override
   Widget build(BuildContext context) {
+    final AppUser? user = _auth.currentUser;
+
     return Scaffold(
       backgroundColor: Colors.white,
       body: SafeArea(
@@ -22,64 +28,72 @@ class HomePage extends StatelessWidget {
                   vertical: 14,
                 ),
                 decoration: BoxDecoration(color: maroon),
-                child: GestureDetector(
-                  onTap: () {
-                    Navigator.pushNamed(context, '/edit-profile');
-                  },
-                  child: Row(
-                    children: [
-                      ClipRRect(
-                        borderRadius: BorderRadius.circular(25),
-                        child: Image.asset(
-                          'assets/images/user.png',
-                          width: 40,
-                          height: 40,
-                          fit: BoxFit.cover,
-                        ),
-                      ),
-                      const SizedBox(width: 12),
-
-                      // Name + Role
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: const [
-                          Text(
-                            "Johnny",
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontWeight: FontWeight.bold,
-                              fontSize: 16,
-                              fontFamily: 'Georgia',
+                child: Row(
+                  children: [
+                    GestureDetector(
+                      onTap: () {
+                        Navigator.pushNamed(context, '/edit-profile');
+                      },
+                      child: Row(
+                        children: [
+                          ClipRRect(
+                            borderRadius: BorderRadius.circular(25),
+                            child: Image.asset(
+                              'assets/images/user.png',
+                              width: 40,
+                              height: 40,
+                              fit: BoxFit.cover,
                             ),
                           ),
-                          SizedBox(height: 2),
-                          Text(
-                            "Admin",
-                            style: TextStyle(
-                              color: Colors.white70,
-                              fontSize: 12,
-                            ),
+                          const SizedBox(width: 12),
+
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                user?.username ?? "User",
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 16,
+                                  fontFamily: 'Georgia',
+                                ),
+                              ),
+                              const SizedBox(height: 2),
+                              Text(
+                                user?.role ?? "",
+                                style: const TextStyle(
+                                  color: Colors.white70,
+                                  fontSize: 12,
+                                ),
+                              ),
+                            ],
                           ),
                         ],
                       ),
+                    ),
 
-                      const Spacer(),
+                    const Spacer(),
 
-                      // Settings Icon
-                      Container(
+                    GestureDetector(
+                      onTap: () async {
+                        await _auth.logout();
+                        Navigator.pushReplacementNamed(context, '/login');
+                      },
+                      child: Container(
                         padding: const EdgeInsets.all(6),
                         decoration: BoxDecoration(
                           color: Colors.white24,
                           borderRadius: BorderRadius.circular(30),
                         ),
                         child: const Icon(
-                          Icons.settings,
+                          Icons.logout,
                           color: Colors.white,
                           size: 22,
                         ),
                       ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
               ),
 
@@ -95,9 +109,7 @@ class HomePage extends StatelessWidget {
               ),
 
               const SizedBox(height: 14),
-
               _imageCard("assets/images/but_first_coffee.png"),
-
               const SizedBox(height: 14),
 
               _menuCard(
@@ -110,9 +122,7 @@ class HomePage extends StatelessWidget {
               ),
 
               const SizedBox(height: 14),
-
               _infoTextCard(),
-
               const SizedBox(height: 14),
 
               _menuCard(
@@ -125,7 +135,6 @@ class HomePage extends StatelessWidget {
               ),
 
               const SizedBox(height: 14),
-
               _imageCard("assets/images/coffe_cup.png"),
             ],
           ),
@@ -206,7 +215,7 @@ class HomePage extends StatelessWidget {
       margin: const EdgeInsets.symmetric(horizontal: 20),
       padding: const EdgeInsets.symmetric(vertical: 22, horizontal: 20),
       decoration: BoxDecoration(
-        color: const Color(0xFF5C2A2A),
+        color: maroon,
         borderRadius: BorderRadius.circular(18),
       ),
       child: Stack(
@@ -227,8 +236,6 @@ class HomePage extends StatelessWidget {
               Divider(color: Colors.white38, thickness: 1),
             ],
           ),
-
-          // Icon Edit
           Positioned(
             right: 0,
             bottom: 0,
