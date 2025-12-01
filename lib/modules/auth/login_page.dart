@@ -26,7 +26,6 @@ class LoginPage extends StatelessWidget {
             ),
           ),
 
-          // TOP TEXT
           Positioned(
             top: 140,
             left: 30,
@@ -49,7 +48,6 @@ class LoginPage extends StatelessWidget {
             ),
           ),
 
-          // BOTTOM FORM - FIXED
           Align(
             alignment: Alignment.bottomCenter,
             child: Container(
@@ -78,13 +76,11 @@ class LoginPage extends StatelessWidget {
                     ),
                     const SizedBox(height: 35),
 
-                    // USERNAME
-                    _inputField(controller: _usernameC, hint: "Username"),
+                    _field(controller: _usernameC, hint: "Username"),
 
                     const SizedBox(height: 18),
 
-                    // PASSWORD
-                    _inputField(
+                    _field(
                       controller: _passwordC,
                       hint: "Password",
                       obscure: true,
@@ -92,7 +88,6 @@ class LoginPage extends StatelessWidget {
 
                     const SizedBox(height: 30),
 
-                    // LOGIN BUTTON
                     SizedBox(
                       width: double.infinity,
                       height: 55,
@@ -161,7 +156,7 @@ class LoginPage extends StatelessWidget {
     );
   }
 
-  Widget _inputField({
+  Widget _field({
     required String hint,
     required TextEditingController controller,
     bool obscure = false,

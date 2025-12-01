@@ -83,12 +83,10 @@ class RegisterPage extends StatelessWidget {
 
                         const SizedBox(height: 35),
 
-                        // USERNAME
                         _field(hint: "Username", controller: _usernameC),
 
                         const SizedBox(height: 20),
 
-                        // PASSWORD
                         _field(
                           hint: "Password",
                           controller: _passwordC,
@@ -97,7 +95,6 @@ class RegisterPage extends StatelessWidget {
 
                         const SizedBox(height: 20),
 
-                        // CONFIRM PASSWORD
                         _field(
                           hint: "Confirm Password",
                           controller: _confirmC,
@@ -106,7 +103,6 @@ class RegisterPage extends StatelessWidget {
 
                         const SizedBox(height: 30),
 
-                        // BUTTON
                         SizedBox(
                           width: double.infinity,
                           height: 48,

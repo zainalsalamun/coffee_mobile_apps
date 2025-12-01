@@ -35,7 +35,6 @@ class _EditProfilePageState extends State<EditProfilePage> {
   void initState() {
     super.initState();
 
-    // INIT EMPTY FIRST → supaya build() tidak error
     nameC = TextEditingController();
     roleC = TextEditingController();
     passC = TextEditingController();
@@ -75,7 +74,6 @@ class _EditProfilePageState extends State<EditProfilePage> {
     ).showSnackBar(const SnackBar(content: Text("Profil berhasil diperbarui")));
   }
 
-  // ADD NEW USER
   Future<void> _saveNewUser() async {
     await _auth.register(
       addNameC.text.trim(),
@@ -127,7 +125,6 @@ class _EditProfilePageState extends State<EditProfilePage> {
               child: _buildBody(),
             ),
 
-            // Bottom Section (Button)
             Positioned(
               bottom: 26,
               left: 0,
@@ -135,7 +132,6 @@ class _EditProfilePageState extends State<EditProfilePage> {
               child: Center(child: _buildBottomButton()),
             ),
 
-            // Back Button
             Positioned(
               bottom: 23,
               left: 20,
@@ -222,7 +218,6 @@ class _EditProfilePageState extends State<EditProfilePage> {
     );
   }
 
-  // ========= MODE: ADD USER =========
   Widget _buildAddUserForm() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
