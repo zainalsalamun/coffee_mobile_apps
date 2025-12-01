@@ -1,10 +1,119 @@
 import 'package:flutter/material.dart';
+import '../../models/user.dart';
+import '../../services/auth_services.dart';
 
-class EditProfilePage extends StatelessWidget {
+enum ProfileMode { normal, addUser, selectUser, editOtherUser }
+
+class EditProfilePage extends StatefulWidget {
   const EditProfilePage({super.key});
 
+  @override
+  State<EditProfilePage> createState() => _EditProfilePageState();
+}
+
+class _EditProfilePageState extends State<EditProfilePage> {
   final Color maroon = const Color(0xFF5C2A2A);
-  final Color cardWhite = Colors.white;
+  final AuthService _auth = AuthService();
+
+  ProfileMode mode = ProfileMode.normal;
+
+  AppUser? currentUser;
+  List<AppUser> otherUsers = [];
+  List<int> selectedIds = [];
+
+  // Controllers for editing own profile
+  late TextEditingController nameC;
+  late TextEditingController roleC;
+  late TextEditingController passC;
+
+  // Controllers for adding/editing other users
+  TextEditingController addNameC = TextEditingController();
+  TextEditingController addRoleC = TextEditingController();
+  TextEditingController addPassC = TextEditingController();
+  AppUser? editingUser;
+  @override
+  void initState() {
+    super.initState();
+
+    // INIT EMPTY FIRST → supaya build() tidak error
+    nameC = TextEditingController();
+    roleC = TextEditingController();
+    passC = TextEditingController();
+
+    _loadUser();
+  }
+
+  Future<void> _loadUser() async {
+    final user = await _auth.getLoggedInUser();
+    final allUsers = await _auth.getAllUsers();
+
+    if (user == null) return;
+
+    setState(() {
+      currentUser = user;
+
+      nameC = TextEditingController(text: user.username);
+      roleC = TextEditingController(text: user.role);
+      passC = TextEditingController(text: user.password);
+
+      otherUsers = allUsers.where((u) => u.id != user.id).toList();
+    });
+  }
+
+  Future<void> _saveProfile() async {
+    if (currentUser == null) return;
+
+    await _auth.updateUser(
+      currentUser!.id,
+      nameC.text.trim(),
+      passC.text.trim(),
+      roleC.text.trim(),
+    );
+
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(const SnackBar(content: Text("Profil berhasil diperbarui")));
+  }
+
+  // ADD NEW USER
+  Future<void> _saveNewUser() async {
+    await _auth.register(
+      addNameC.text.trim(),
+      addPassC.text.trim(),
+      role: addRoleC.text.trim(),
+    );
+
+    addNameC.clear();
+    addPassC.clear();
+    addRoleC.clear();
+
+    setState(() => mode = ProfileMode.normal);
+    _loadUser();
+  }
+
+  Future<void> _saveEditOtherUser() async {
+    if (editingUser == null) return;
+
+    await _auth.updateUser(
+      editingUser!.id,
+      addNameC.text.trim(),
+      addPassC.text.trim(),
+      addRoleC.text.trim(),
+    );
+
+    setState(() => mode = ProfileMode.normal);
+    _loadUser();
+  }
+
+  Future<void> _deleteSelected() async {
+    for (var id in selectedIds) {
+      await _auth.deleteUser(id);
+    }
+
+    selectedIds.clear();
+    setState(() => mode = ProfileMode.normal);
+    _loadUser();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -15,151 +124,18 @@ class EditProfilePage extends StatelessWidget {
           children: [
             SingleChildScrollView(
               padding: const EdgeInsets.fromLTRB(26, 30, 26, 120),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Center(
-                    child: Column(
-                      children: [
-                        ClipRRect(
-                          borderRadius: BorderRadius.circular(60),
-                          child: Image.asset(
-                            "assets/images/user.png",
-                            width: 95,
-                            height: 95,
-                            fit: BoxFit.cover,
-                          ),
-                        ),
-                        const SizedBox(height: 30),
-                      ],
-                    ),
-                  ),
-
-                  const Text(
-                    "Nama",
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontFamily: 'Georgia',
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  const SizedBox(height: 6),
-
-                  _textFieldBox(value: "Johnny"),
-                  const SizedBox(height: 20),
-
-                  const Text(
-                    "Jabatan",
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontFamily: 'Georgia',
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  const SizedBox(height: 6),
-
-                  _textFieldBox(value: "Admin"),
-                  const SizedBox(height: 20),
-
-                  const Text(
-                    "Password",
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontFamily: 'Georgia',
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  const SizedBox(height: 6),
-
-                  _textFieldBox(value: "********", obscure: true),
-                  const SizedBox(height: 30),
-
-                  const Text(
-                    "Pengguna Lain:",
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontFamily: 'Georgia',
-                      fontSize: 17,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-
-                  const SizedBox(height: 14),
-
-                  _otherUserTile(
-                    avatar: "assets/images/user.png",
-                    name: "Jake",
-                    role: "Barista",
-                  ),
-                  const SizedBox(height: 10),
-
-                  _otherUserTile(
-                    avatar: "assets/images/user.png",
-                    name: "Jay",
-                    role: "Barista",
-                  ),
-
-                  const SizedBox(height: 18),
-
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: const [
-                      Text(
-                        "Tambah",
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 13,
-                          fontFamily: 'Georgia',
-                        ),
-                      ),
-                      Text(
-                        "Pilih",
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 13,
-                          fontFamily: 'Georgia',
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
+              child: _buildBody(),
             ),
 
+            // Bottom Section (Button)
             Positioned(
               bottom: 26,
               left: 0,
               right: 0,
-              child: Center(
-                child: SizedBox(
-                  width: 160,
-                  height: 48,
-                  child: ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.white,
-                      foregroundColor: maroon,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(22),
-                      ),
-                      elevation: 3,
-                    ),
-                    onPressed: () {},
-                    child: const Text(
-                      "Edit",
-                      style: TextStyle(
-                        fontFamily: 'Georgia',
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
-                ),
-              ),
+              child: Center(child: _buildBottomButton()),
             ),
 
+            // Back Button
             Positioned(
               bottom: 23,
               left: 20,
@@ -181,56 +157,179 @@ class EditProfilePage extends StatelessWidget {
     );
   }
 
-  Widget _textFieldBox({required String value, bool obscure = false}) {
-    return Container(
-      height: 44,
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(2),
-        border: Border.all(color: Color(0xFFE6E6E6), width: 1),
-      ),
-      child: Material(
-        color: Colors.transparent,
-        child: TextField(
-          controller: TextEditingController(text: value),
-          obscureText: obscure,
-          style: const TextStyle(
-            fontFamily: 'Georgia',
-            fontSize: 18,
-            color: Colors.black,
-          ),
-          decoration: const InputDecoration(
-            border: InputBorder.none,
-            isCollapsed: true,
-            contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 12),
-            filled: false,
-          ),
+  Widget _buildBody() {
+    switch (mode) {
+      case ProfileMode.addUser:
+        return _buildAddUserForm();
+
+      case ProfileMode.editOtherUser:
+        return _buildEditOtherUserForm();
+
+      case ProfileMode.selectUser:
+        return _buildSelectUserList();
+
+      default:
+        return _buildNormalMode();
+    }
+  }
+
+  Widget _buildNormalMode() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _buildAvatar(),
+
+        _label("Nama"),
+        _textFieldBox(controller: nameC),
+        const SizedBox(height: 20),
+
+        _label("Jabatan"),
+        _textFieldBox(controller: roleC),
+        const SizedBox(height: 20),
+
+        _label("Password"),
+        _textFieldBox(controller: passC, obscure: true),
+        const SizedBox(height: 30),
+
+        _label("Pengguna Lain:"),
+        const SizedBox(height: 14),
+
+        Column(
+          children:
+              otherUsers.map((u) {
+                return Padding(
+                  padding: const EdgeInsets.only(bottom: 10),
+                  child: _tileUserNormal(u),
+                );
+              }).toList(),
         ),
+
+        const SizedBox(height: 18),
+
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            _clickText("Tambah", () {
+              setState(() => mode = ProfileMode.addUser);
+            }),
+            _clickText("Pilih", () {
+              selectedIds.clear();
+              setState(() => mode = ProfileMode.selectUser);
+            }),
+          ],
+        ),
+      ],
+    );
+  }
+
+  // ========= MODE: ADD USER =========
+  Widget _buildAddUserForm() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _buildAvatar(addMode: true),
+
+        _label("Nama"),
+        _textFieldBox(controller: addNameC),
+        const SizedBox(height: 20),
+
+        _label("Jabatan"),
+        _textFieldBox(controller: addRoleC),
+        const SizedBox(height: 20),
+
+        _label("Password"),
+        _textFieldBox(controller: addPassC, obscure: true),
+      ],
+    );
+  }
+
+  Widget _buildEditOtherUserForm() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _buildAvatar(addMode: true),
+
+        _label("Nama"),
+        _textFieldBox(controller: addNameC),
+        const SizedBox(height: 20),
+
+        _label("Jabatan"),
+        _textFieldBox(controller: addRoleC),
+        const SizedBox(height: 20),
+
+        _label("Password"),
+        _textFieldBox(controller: addPassC, obscure: true),
+      ],
+    );
+  }
+
+  Widget _buildSelectUserList() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _buildAvatar(),
+
+        _label("Pengguna Lain:"),
+        const SizedBox(height: 14),
+
+        Column(
+          children:
+              otherUsers.map((u) {
+                final isSelected = selectedIds.contains(u.id);
+                return Padding(
+                  padding: const EdgeInsets.only(bottom: 10),
+                  child: _tileUserSelect(u, isSelected),
+                );
+              }).toList(),
+        ),
+
+        const SizedBox(height: 18),
+
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            _clickText("Batalkan", () {
+              selectedIds.clear();
+              setState(() => mode = ProfileMode.normal);
+            }),
+            _clickText("Hapus", _deleteSelected),
+          ],
+        ),
+      ],
+    );
+  }
+
+  Widget _buildAvatar({bool addMode = false}) {
+    return Center(
+      child: Column(
+        children: [
+          ClipRRect(
+            borderRadius: BorderRadius.circular(60),
+            child: Image.asset(
+              "assets/images/user.png",
+              width: 95,
+              height: 95,
+              fit: BoxFit.cover,
+            ),
+          ),
+          const SizedBox(height: 30),
+        ],
       ),
     );
   }
 
-  Widget _otherUserTile({
-    required String avatar,
-    required String name,
-    required String role,
-  }) {
+  Widget _tileUserNormal(AppUser u) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
       decoration: BoxDecoration(
-        color: cardWhite,
+        color: Colors.white,
         borderRadius: BorderRadius.circular(12),
       ),
       child: Row(
         children: [
-          ClipRRect(
-            borderRadius: BorderRadius.circular(25),
-            child: Image.asset(
-              avatar,
-              width: 38,
-              height: 38,
-              fit: BoxFit.cover,
-            ),
+          CircleAvatar(
+            radius: 19,
+            backgroundImage: AssetImage("assets/images/user.png"),
           ),
           const SizedBox(width: 12),
 
@@ -238,20 +337,19 @@ class EditProfilePage extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                name,
+                u.username,
                 style: const TextStyle(
-                  color: Colors.black,
-                  fontFamily: 'Georgia',
-                  fontSize: 16,
                   fontWeight: FontWeight.bold,
+                  fontSize: 16,
+                  fontFamily: 'Georgia',
                 ),
               ),
               Text(
-                role,
+                u.role,
                 style: const TextStyle(
                   color: Colors.black54,
-                  fontFamily: 'Georgia',
                   fontSize: 12,
+                  fontFamily: 'Georgia',
                 ),
               ),
             ],
@@ -259,15 +357,201 @@ class EditProfilePage extends StatelessWidget {
 
           const Spacer(),
 
-          Container(
-            padding: const EdgeInsets.all(6),
-            decoration: BoxDecoration(
-              color: maroon,
-              borderRadius: BorderRadius.circular(20),
+          GestureDetector(
+            onTap: () {
+              editingUser = u;
+              addNameC.text = u.username;
+              addRoleC.text = u.role;
+              addPassC.text = u.password;
+              setState(() => mode = ProfileMode.editOtherUser);
+            },
+            child: Container(
+              padding: const EdgeInsets.all(6),
+              decoration: BoxDecoration(
+                color: maroon,
+                borderRadius: BorderRadius.circular(20),
+              ),
+              child: const Icon(Icons.settings, size: 16, color: Colors.white),
             ),
-            child: const Icon(Icons.settings, size: 16, color: Colors.white),
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _tileUserSelect(AppUser u, bool isSelected) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Row(
+        children: [
+          CircleAvatar(
+            radius: 19,
+            backgroundImage: AssetImage("assets/images/user.png"),
+          ),
+          const SizedBox(width: 12),
+
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                u.username,
+                style: const TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 16,
+                  fontFamily: 'Georgia',
+                ),
+              ),
+              Text(
+                u.role,
+                style: const TextStyle(
+                  color: Colors.black54,
+                  fontSize: 12,
+                  fontFamily: 'Georgia',
+                ),
+              ),
+            ],
+          ),
+
+          const Spacer(),
+
+          GestureDetector(
+            onTap: () {
+              setState(() {
+                if (isSelected) {
+                  selectedIds.remove(u.id);
+                } else {
+                  selectedIds.add(u.id);
+                }
+              });
+            },
+            child: Container(
+              width: 28,
+              height: 28,
+              decoration: BoxDecoration(
+                color: isSelected ? Colors.red : Colors.white,
+                border: Border.all(color: Colors.black, width: 1),
+                borderRadius: BorderRadius.circular(6),
+              ),
+              child:
+                  isSelected
+                      ? const Icon(Icons.check, color: Colors.white, size: 18)
+                      : null,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _label(String text) {
+    return Text(
+      text,
+      style: const TextStyle(
+        color: Colors.white,
+        fontFamily: 'Georgia',
+        fontSize: 16,
+        fontWeight: FontWeight.bold,
+      ),
+    );
+  }
+
+  Widget _textFieldBox({
+    required TextEditingController controller,
+    bool obscure = false,
+  }) {
+    return Container(
+      height: 44,
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: TextField(
+        controller: controller,
+        obscureText: obscure,
+        style: const TextStyle(
+          fontFamily: 'Georgia',
+          fontSize: 18,
+          color: Colors.black,
+        ),
+        cursorColor: Colors.black,
+        enableSuggestions: false,
+        autocorrect: false,
+
+        decoration: const InputDecoration(
+          filled: true,
+          fillColor: Colors.white,
+          hintStyle: TextStyle(color: Colors.black54, fontFamily: 'Georgia'),
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.all(Radius.circular(12)),
+            borderSide: BorderSide(color: Colors.white),
+          ),
+          enabledBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.all(Radius.circular(12)),
+            borderSide: BorderSide(color: Colors.white),
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.all(Radius.circular(12)),
+            borderSide: BorderSide(color: Colors.white),
+          ),
+          contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        ),
+      ),
+    );
+  }
+
+  Widget _clickText(String text, VoidCallback onTap) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Text(
+        text,
+        style: const TextStyle(
+          color: Colors.white,
+          fontSize: 13,
+          fontFamily: 'Georgia',
+        ),
+      ),
+    );
+  }
+
+  Widget _buildBottomButton() {
+    switch (mode) {
+      case ProfileMode.addUser:
+        return _mainButton("Simpan", _saveNewUser);
+
+      case ProfileMode.editOtherUser:
+        return _mainButton("Simpan", _saveEditOtherUser);
+
+      default:
+        return _mainButton("Edit", _saveProfile);
+    }
+  }
+
+  Widget _mainButton(String label, VoidCallback onTap) {
+    return SizedBox(
+      width: 160,
+      height: 48,
+      child: ElevatedButton(
+        style: ElevatedButton.styleFrom(
+          backgroundColor: Colors.white,
+          foregroundColor: maroon,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(22),
+          ),
+          elevation: 3,
+        ),
+        onPressed: onTap,
+        child: Text(
+          label,
+          style: const TextStyle(
+            fontFamily: 'Georgia',
+            fontSize: 18,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
       ),
     );
   }
