@@ -27,6 +27,10 @@ class HiveService {
       Hive.openBox<MenuItem>(menuBoxName),
       Hive.openBox<EquipmentItem>(equipmentBoxName),
       Hive.openBox<StockItem>(stockBoxName),
+
+      Hive.openBox('login'),
+      Hive.openBox<AppUser>('users'),
+      Hive.openBox<AppUser>('usersBox'),
     ]);
 
     // Seed admin user
