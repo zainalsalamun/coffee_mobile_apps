@@ -1,4 +1,7 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import '../../models/user.dart';
 import '../../services/auth_services.dart';
 
@@ -42,6 +45,22 @@ class _EditProfilePageState extends State<EditProfilePage> {
     _loadUser();
   }
 
+  // Future<void> _loadUser() async {
+  //   final user = await _auth.getLoggedInUser();
+  //   final allUsers = await _auth.getAllUsers();
+
+  //   if (user == null) return;
+
+  //   setState(() {
+  //     currentUser = user;
+
+  //     nameC = TextEditingController(text: user.username);
+  //     roleC = TextEditingController(text: user.role);
+  //     passC = TextEditingController(text: user.password);
+
+  //     otherUsers = allUsers.where((u) => u.id != user.id).toList();
+  //   });
+  // }
   Future<void> _loadUser() async {
     final user = await _auth.getLoggedInUser();
     final allUsers = await _auth.getAllUsers();
@@ -55,6 +74,8 @@ class _EditProfilePageState extends State<EditProfilePage> {
       roleC = TextEditingController(text: user.role);
       passC = TextEditingController(text: user.password);
 
+      avatarPath = user.avatarPath; // ⬅️ TAMBAH INI
+
       otherUsers = allUsers.where((u) => u.id != user.id).toList();
     });
   }
@@ -67,6 +88,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
       nameC.text.trim(),
       passC.text.trim(),
       roleC.text.trim(),
+      newAvatarPath: avatarPath,
     );
 
     ScaffoldMessenger.of(
@@ -97,6 +119,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
       addNameC.text.trim(),
       addPassC.text.trim(),
       addRoleC.text.trim(),
+      newAvatarPath: avatarPath,
     );
 
     setState(() => mode = ProfileMode.normal);
@@ -294,20 +317,62 @@ class _EditProfilePageState extends State<EditProfilePage> {
     );
   }
 
+  // Widget _buildAvatar({bool addMode = false}) {
+  //   return Center(
+  //     child: Column(
+  //       children: [
+  //         ClipRRect(
+  //           borderRadius: BorderRadius.circular(60),
+  //           child: Image.asset(
+  //             "assets/images/user.png",
+  //             width: 95,
+  //             height: 95,
+  //             fit: BoxFit.cover,
+  //           ),
+  //         ),
+  //         const SizedBox(height: 30),
+  //       ],
+  //     ),
+  //   );
+  // }
   Widget _buildAvatar({bool addMode = false}) {
     return Center(
       child: Column(
         children: [
-          ClipRRect(
-            borderRadius: BorderRadius.circular(60),
-            child: Image.asset(
-              "assets/images/user.png",
-              width: 95,
-              height: 95,
-              fit: BoxFit.cover,
+          GestureDetector(
+            onTap: () async {
+              if (!addMode) await _pickAvatar();
+            },
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(60),
+              child:
+                  avatarPath != null
+                      ? Image.file(
+                        File(avatarPath!),
+                        width: 95,
+                        height: 95,
+                        fit: BoxFit.cover,
+                      )
+                      : Image.asset(
+                        "assets/images/user.png",
+                        width: 95,
+                        height: 95,
+                        fit: BoxFit.cover,
+                      ),
             ),
           ),
-          const SizedBox(height: 30),
+          const SizedBox(height: 12),
+
+          if (!addMode)
+            const Text(
+              "Tap untuk ubah foto",
+              style: TextStyle(
+                color: Colors.white70,
+                fontSize: 12,
+                fontFamily: 'Georgia',
+              ),
+            ),
+          const SizedBox(height: 20),
         ],
       ),
     );
@@ -549,5 +614,18 @@ class _EditProfilePageState extends State<EditProfilePage> {
         ),
       ),
     );
+  }
+
+  String? avatarPath;
+
+  Future<void> _pickAvatar() async {
+    final picker = ImagePicker();
+    final picked = await picker.pickImage(source: ImageSource.gallery);
+
+    if (picked != null) {
+      setState(() {
+        avatarPath = picked.path;
+      });
+    }
   }
 }
