@@ -15,8 +15,14 @@ class _SplashPageState extends State<SplashPage> {
   @override
   void initState() {
     super.initState();
+    _checkLogin();
+  }
+
+  void _checkLogin() {
     Future.delayed(const Duration(seconds: 2), () {
       final user = _auth.currentUser;
+
+      if (!mounted) return;
 
       if (user != null) {
         Navigator.pushReplacementNamed(context, '/home');
