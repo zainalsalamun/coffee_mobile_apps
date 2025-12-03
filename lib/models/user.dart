@@ -1,14 +1,11 @@
 import 'package:hive/hive.dart';
 
-// ======================
-// MODEL USER
-// ======================
 class AppUser {
   int id;
   String username;
   String password;
   String role;
-  String? avatarPath; // <— tambah ini
+  String? avatarPath;
 
   AppUser({
     required this.id,
@@ -19,9 +16,6 @@ class AppUser {
   });
 }
 
-// ======================
-// MANUAL ADAPTER
-// ======================
 class AppUserAdapter extends TypeAdapter<AppUser> {
   @override
   final int typeId = 1;
@@ -33,6 +27,7 @@ class AppUserAdapter extends TypeAdapter<AppUser> {
       username: reader.readString(),
       password: reader.readString(),
       role: reader.readString(),
+      avatarPath: reader.read(),
     );
   }
 
@@ -42,5 +37,6 @@ class AppUserAdapter extends TypeAdapter<AppUser> {
     writer.writeString(obj.username);
     writer.writeString(obj.password);
     writer.writeString(obj.role);
+    writer.write(obj.avatarPath);
   }
 }

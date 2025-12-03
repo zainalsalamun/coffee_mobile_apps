@@ -1,7 +1,8 @@
 import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:path_provider/path_provider.dart';
+
 import '../../models/user.dart';
 import '../../services/auth_services.dart';
 
@@ -29,38 +30,24 @@ class _EditProfilePageState extends State<EditProfilePage> {
   late TextEditingController roleC;
   late TextEditingController passC;
 
-  // Controllers for adding/editing other users
+  // Controllers for add/edit other users
   TextEditingController addNameC = TextEditingController();
   TextEditingController addRoleC = TextEditingController();
   TextEditingController addPassC = TextEditingController();
   AppUser? editingUser;
+
+  // Avatar
+  String? avatarPath;
+
   @override
   void initState() {
     super.initState();
-
     nameC = TextEditingController();
     roleC = TextEditingController();
     passC = TextEditingController();
-
     _loadUser();
   }
 
-  // Future<void> _loadUser() async {
-  //   final user = await _auth.getLoggedInUser();
-  //   final allUsers = await _auth.getAllUsers();
-
-  //   if (user == null) return;
-
-  //   setState(() {
-  //     currentUser = user;
-
-  //     nameC = TextEditingController(text: user.username);
-  //     roleC = TextEditingController(text: user.role);
-  //     passC = TextEditingController(text: user.password);
-
-  //     otherUsers = allUsers.where((u) => u.id != user.id).toList();
-  //   });
-  // }
   Future<void> _loadUser() async {
     final user = await _auth.getLoggedInUser();
     final allUsers = await _auth.getAllUsers();
@@ -70,11 +57,10 @@ class _EditProfilePageState extends State<EditProfilePage> {
     setState(() {
       currentUser = user;
 
-      nameC = TextEditingController(text: user.username);
-      roleC = TextEditingController(text: user.role);
-      passC = TextEditingController(text: user.password);
-
-      avatarPath = user.avatarPath; // ⬅️ TAMBAH INI
+      nameC.text = user.username;
+      roleC.text = user.role;
+      passC.text = user.password;
+      avatarPath = user.avatarPath; // ambil avatar
 
       otherUsers = allUsers.where((u) => u.id != user.id).toList();
     });
@@ -104,8 +90,8 @@ class _EditProfilePageState extends State<EditProfilePage> {
     );
 
     addNameC.clear();
-    addPassC.clear();
     addRoleC.clear();
+    addPassC.clear();
 
     setState(() => mode = ProfileMode.normal);
     _loadUser();
@@ -130,10 +116,25 @@ class _EditProfilePageState extends State<EditProfilePage> {
     for (var id in selectedIds) {
       await _auth.deleteUser(id);
     }
-
     selectedIds.clear();
     setState(() => mode = ProfileMode.normal);
     _loadUser();
+  }
+
+  Future<void> _pickAvatar() async {
+    final picker = ImagePicker();
+    final picked = await picker.pickImage(source: ImageSource.gallery);
+
+    if (picked == null) return;
+
+    final dir = await getApplicationDocumentsDirectory();
+    final newPath = "${dir.path}/avatar_${currentUser!.id}.jpg";
+
+    final file = await File(picked.path).copy(newPath);
+
+    setState(() {
+      avatarPath = file.path;
+    });
   }
 
   @override
@@ -180,13 +181,10 @@ class _EditProfilePageState extends State<EditProfilePage> {
     switch (mode) {
       case ProfileMode.addUser:
         return _buildAddUserForm();
-
       case ProfileMode.editOtherUser:
         return _buildEditOtherUserForm();
-
       case ProfileMode.selectUser:
         return _buildSelectUserList();
-
       default:
         return _buildNormalMode();
     }
@@ -215,12 +213,14 @@ class _EditProfilePageState extends State<EditProfilePage> {
 
         Column(
           children:
-              otherUsers.map((u) {
-                return Padding(
-                  padding: const EdgeInsets.only(bottom: 10),
-                  child: _tileUserNormal(u),
-                );
-              }).toList(),
+              otherUsers
+                  .map(
+                    (u) => Padding(
+                      padding: const EdgeInsets.only(bottom: 10),
+                      child: _tileUserNormal(u),
+                    ),
+                  )
+                  .toList(),
         ),
 
         const SizedBox(height: 18),
@@ -292,13 +292,14 @@ class _EditProfilePageState extends State<EditProfilePage> {
 
         Column(
           children:
-              otherUsers.map((u) {
-                final isSelected = selectedIds.contains(u.id);
-                return Padding(
-                  padding: const EdgeInsets.only(bottom: 10),
-                  child: _tileUserSelect(u, isSelected),
-                );
-              }).toList(),
+              otherUsers
+                  .map(
+                    (u) => Padding(
+                      padding: const EdgeInsets.only(bottom: 10),
+                      child: _tileUserSelect(u, selectedIds.contains(u.id)),
+                    ),
+                  )
+                  .toList(),
         ),
 
         const SizedBox(height: 18),
@@ -317,24 +318,6 @@ class _EditProfilePageState extends State<EditProfilePage> {
     );
   }
 
-  // Widget _buildAvatar({bool addMode = false}) {
-  //   return Center(
-  //     child: Column(
-  //       children: [
-  //         ClipRRect(
-  //           borderRadius: BorderRadius.circular(60),
-  //           child: Image.asset(
-  //             "assets/images/user.png",
-  //             width: 95,
-  //             height: 95,
-  //             fit: BoxFit.cover,
-  //           ),
-  //         ),
-  //         const SizedBox(height: 30),
-  //       ],
-  //     ),
-  //   );
-  // }
   Widget _buildAvatar({bool addMode = false}) {
     return Center(
       child: Column(
@@ -372,6 +355,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                 fontFamily: 'Georgia',
               ),
             ),
+
           const SizedBox(height: 20),
         ],
       ),
@@ -389,7 +373,11 @@ class _EditProfilePageState extends State<EditProfilePage> {
         children: [
           CircleAvatar(
             radius: 19,
-            backgroundImage: AssetImage("assets/images/user.png"),
+            backgroundImage:
+                u.avatarPath != null
+                    ? FileImage(File(u.avatarPath!))
+                    : const AssetImage("assets/images/user.png")
+                        as ImageProvider,
           ),
           const SizedBox(width: 12),
 
@@ -423,6 +411,9 @@ class _EditProfilePageState extends State<EditProfilePage> {
               addNameC.text = u.username;
               addRoleC.text = u.role;
               addPassC.text = u.password;
+
+              avatarPath = u.avatarPath;
+
               setState(() => mode = ProfileMode.editOtherUser);
             },
             child: Container(
@@ -450,7 +441,11 @@ class _EditProfilePageState extends State<EditProfilePage> {
         children: [
           CircleAvatar(
             radius: 19,
-            backgroundImage: AssetImage("assets/images/user.png"),
+            backgroundImage:
+                u.avatarPath != null
+                    ? FileImage(File(u.avatarPath!))
+                    : const AssetImage("assets/images/user.png")
+                        as ImageProvider,
           ),
           const SizedBox(width: 12),
 
@@ -537,10 +532,6 @@ class _EditProfilePageState extends State<EditProfilePage> {
           fontSize: 18,
           color: Colors.black,
         ),
-        cursorColor: Colors.black,
-        enableSuggestions: false,
-        autocorrect: false,
-
         decoration: const InputDecoration(
           filled: true,
           fillColor: Colors.white,
@@ -581,10 +572,8 @@ class _EditProfilePageState extends State<EditProfilePage> {
     switch (mode) {
       case ProfileMode.addUser:
         return _mainButton("Simpan", _saveNewUser);
-
       case ProfileMode.editOtherUser:
         return _mainButton("Simpan", _saveEditOtherUser);
-
       default:
         return _mainButton("Edit", _saveProfile);
     }
@@ -614,18 +603,5 @@ class _EditProfilePageState extends State<EditProfilePage> {
         ),
       ),
     );
-  }
-
-  String? avatarPath;
-
-  Future<void> _pickAvatar() async {
-    final picker = ImagePicker();
-    final picked = await picker.pickImage(source: ImageSource.gallery);
-
-    if (picked != null) {
-      setState(() {
-        avatarPath = picked.path;
-      });
-    }
   }
 }
