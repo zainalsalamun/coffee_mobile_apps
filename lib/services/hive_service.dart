@@ -14,30 +14,30 @@ class HiveService {
   static Future<void> init() async {
     await Hive.initFlutter();
 
-    // Register adapters
     Hive
       ..registerAdapter(AppUserAdapter())
       ..registerAdapter(MenuItemAdapter())
       ..registerAdapter(EquipmentItemAdapter())
       ..registerAdapter(StockItemAdapter());
 
-    await Future.wait([
-      Hive.openBox<AppUser>(usersBoxName),
-      Hive.openBox(authBoxName),
-      Hive.openBox<MenuItem>(menuBoxName),
-      Hive.openBox<EquipmentItem>(equipmentBoxName),
-      Hive.openBox<StockItem>(stockBoxName),
+    await Hive.openBox<AppUser>(usersBoxName);
+    await Hive.openBox(authBoxName);
+    await Hive.openBox<MenuItem>(menuBoxName);
+    await Hive.openBox<EquipmentItem>(equipmentBoxName);
+    await Hive.openBox<StockItem>(stockBoxName);
 
-      Hive.openBox('login'),
-      Hive.openBox<AppUser>('users'),
-      Hive.openBox<AppUser>('usersBox'),
-    ]);
-
-    // Seed admin user
+    // SAFE: memastikan box benar-benar open
     final usersBox = Hive.box<AppUser>(usersBoxName);
+
     if (usersBox.isEmpty) {
       usersBox.add(
-        AppUser(id: 1, username: 'admin', password: 'admin123', role: 'admin'),
+        AppUser(
+          id: 1,
+          username: 'admin',
+          password: 'admin123',
+          role: 'admin',
+          avatarPath: null,
+        ),
       );
     }
   }
