@@ -28,7 +28,7 @@ class AuthService {
       _authBox.put(currentUserKey, user.id);
       return user;
     } catch (e) {
-      return null; // user tidak ditemukan
+      return null;
     }
   }
 
@@ -37,17 +37,14 @@ class AuthService {
     String password, {
     String role = 'user',
   }) async {
-    // cek username sudah digunakan belum
     final exists = _usersBox.values.any(
       (u) => u.username.toLowerCase() == username.toLowerCase(),
     );
     if (exists) return null;
 
-    // auto increment id
+    // auto increment ID
     final newId =
-        (_usersBox.values
-            .map((u) => u.id)
-            .fold<int>(0, (p, c) => c > p ? c : p)) +
+        (_usersBox.values.map((e) => e.id).fold(0, (p, c) => c > p ? c : p)) +
         1;
 
     final user = AppUser(
@@ -59,7 +56,7 @@ class AuthService {
 
     await _usersBox.put(newId, user);
 
-    // otomatis login setelah register
+    // auto login
     _authBox.put(currentUserKey, newId);
 
     return user;
@@ -101,22 +98,31 @@ class AuthService {
     int id,
     String newUsername,
     String newPassword,
-    String newRole,
-  ) async {
-    final key = _usersBox.keys.firstWhere(
-      (k) => _usersBox.get(k)?.id == id,
+    String newRole, {
+    String? newAvatarPath,
+  }) async {
+    // gunakan box yang BENAR
+    final box = _usersBox;
+
+    final key = box.keys.firstWhere(
+      (k) => box.get(k)?.id == id,
       orElse: () => null,
     );
 
     if (key == null) return;
 
-    final user = _usersBox.get(key);
+    final user = box.get(key);
+
     if (user == null) return;
 
     user.username = newUsername;
     user.password = newPassword;
     user.role = newRole;
 
-    await _usersBox.put(key, user);
+    if (newAvatarPath != null) {
+      user.avatarPath = newAvatarPath;
+    }
+
+    await box.put(key, user);
   }
 }
