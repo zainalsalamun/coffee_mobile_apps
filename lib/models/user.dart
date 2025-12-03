@@ -27,7 +27,7 @@ class AppUserAdapter extends TypeAdapter<AppUser> {
       username: reader.readString(),
       password: reader.readString(),
       role: reader.readString(),
-      avatarPath: reader.read(),
+      avatarPath: reader.read() as String?,
     );
   }
 
