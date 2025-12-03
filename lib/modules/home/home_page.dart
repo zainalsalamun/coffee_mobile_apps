@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:hive/hive.dart';
 import '../../models/user.dart';
 import '../../services/auth_services.dart';
 
@@ -14,6 +15,13 @@ class HomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final AppUser? user = _auth.currentUser;
+    final box = Hive.box<AppUser>('users_box');
+    print("=== USERS BOX ===");
+    box.toMap().forEach((key, user) {
+      print(
+        "KEY: $key — ${user.username}, role: ${user.role}, avatar: ${user.avatarPath}",
+      );
+    });
 
     return Scaffold(
       backgroundColor: Colors.white,

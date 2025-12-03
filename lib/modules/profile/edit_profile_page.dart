@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:hive/hive.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:path_provider/path_provider.dart';
 
@@ -46,6 +47,13 @@ class _EditProfilePageState extends State<EditProfilePage> {
     roleC = TextEditingController();
     passC = TextEditingController();
     _loadUser();
+    final box = Hive.box<AppUser>('users_box');
+    print("=== USERS BOX ===");
+    box.toMap().forEach((key, user) {
+      print(
+        "KEY: $key — ${user.username}, role: ${user.role}, avatar: ${user.avatarPath}",
+      );
+    });
   }
 
   Future<void> _loadUser() async {
