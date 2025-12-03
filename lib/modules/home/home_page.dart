@@ -1,6 +1,7 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
-import 'package:coffe_mobile_apps/services/auth_services.dart';
 import '../../models/user.dart';
+import '../../services/auth_services.dart';
 
 class HomePage extends StatelessWidget {
   HomePage({super.key});
@@ -21,6 +22,7 @@ class HomePage extends StatelessWidget {
           padding: const EdgeInsets.only(bottom: 30),
           child: Column(
             children: [
+              // HEADER
               Container(
                 width: double.infinity,
                 padding: const EdgeInsets.symmetric(
@@ -32,21 +34,20 @@ class HomePage extends StatelessWidget {
                   children: [
                     GestureDetector(
                       onTap: () {
-                        Navigator.pushNamed(context, '/edit-profile');
+                        Navigator.pushNamed(
+                          context,
+                          '/edit-profile',
+                        ).then((_) => (context as Element).markNeedsBuild());
                       },
                       child: Row(
                         children: [
                           ClipRRect(
                             borderRadius: BorderRadius.circular(25),
-                            child: Image.asset(
-                              'assets/images/user.png',
-                              width: 40,
-                              height: 40,
-                              fit: BoxFit.cover,
-                            ),
+                            child: _buildAvatar(user),
                           ),
                           const SizedBox(width: 12),
 
+                          // Name & Role
                           Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
@@ -75,6 +76,7 @@ class HomePage extends StatelessWidget {
 
                     const Spacer(),
 
+                    // LOGOUT BUTTON
                     GestureDetector(
                       onTap: () async {
                         await _auth.logout();
@@ -99,13 +101,12 @@ class HomePage extends StatelessWidget {
 
               const SizedBox(height: 20),
 
+              // MENU SECTION
               _menuCard(
                 icon: Icons.coffee,
                 label: "Menu",
                 bgColor: maroonDark,
-                onTap: () {
-                  Navigator.pushNamed(context, '/menu');
-                },
+                onTap: () => Navigator.pushNamed(context, '/menu'),
               ),
 
               const SizedBox(height: 14),
@@ -116,9 +117,7 @@ class HomePage extends StatelessWidget {
                 icon: Icons.kitchen,
                 label: "Peralatan dan Mesin",
                 bgColor: maroonDark,
-                onTap: () {
-                  Navigator.pushNamed(context, '/equipment');
-                },
+                onTap: () => Navigator.pushNamed(context, '/equipment'),
               ),
 
               const SizedBox(height: 14),
@@ -129,9 +128,7 @@ class HomePage extends StatelessWidget {
                 icon: Icons.inventory_2,
                 label: "Persediaan",
                 bgColor: maroonDark,
-                onTap: () {
-                  Navigator.pushNamed(context, '/persediaan');
-                },
+                onTap: () => Navigator.pushNamed(context, '/persediaan'),
               ),
 
               const SizedBox(height: 14),
@@ -143,6 +140,26 @@ class HomePage extends StatelessWidget {
     );
   }
 
+  // 🔥 FIX — AVATAR DYNAMIC
+  Widget _buildAvatar(AppUser? user) {
+    if (user?.avatarPath != null && user!.avatarPath!.isNotEmpty) {
+      return Image.file(
+        File(user.avatarPath!),
+        width: 40,
+        height: 40,
+        fit: BoxFit.cover,
+      );
+    } else {
+      return Image.asset(
+        'assets/images/user.png',
+        width: 40,
+        height: 40,
+        fit: BoxFit.cover,
+      );
+    }
+  }
+
+  // MENU CARD
   Widget _menuCard({
     required IconData icon,
     required String label,
@@ -182,6 +199,7 @@ class HomePage extends StatelessWidget {
     );
   }
 
+  // IMAGE CARD
   Widget _imageCard(String path) {
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 20),
@@ -209,6 +227,7 @@ class HomePage extends StatelessWidget {
     );
   }
 
+  // INFO TEXT CARD
   Widget _infoTextCard() {
     return Container(
       width: double.infinity,
