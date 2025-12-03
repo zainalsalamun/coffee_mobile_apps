@@ -101,7 +101,6 @@ class AuthService {
     String newRole, {
     String? newAvatarPath,
   }) async {
-    // gunakan box yang BENAR
     final box = _usersBox;
 
     final key = box.keys.firstWhere(
@@ -112,7 +111,6 @@ class AuthService {
     if (key == null) return;
 
     final user = box.get(key);
-
     if (user == null) return;
 
     user.username = newUsername;
