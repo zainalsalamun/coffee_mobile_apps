@@ -7,13 +7,15 @@ class AppUser {
   int id;
   String username;
   String password;
-  String role; // admin / user
+  String role;
+  String? avatarPath; // <— tambah ini
 
   AppUser({
     required this.id,
     required this.username,
     required this.password,
     required this.role,
+    this.avatarPath,
   });
 }
 
