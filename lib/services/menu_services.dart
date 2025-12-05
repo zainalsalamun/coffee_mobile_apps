@@ -1,42 +1,40 @@
 import 'package:hive/hive.dart';
+
 import '../models/menu_item.dart';
 import 'hive_service.dart';
 
 class MenuService {
-  final Box<MenuItem> _box = Hive.box<MenuItem>(HiveService.menuBoxName);
+  MenuService._();
+  static final MenuService instance = MenuService._();
 
-  // Ambil semua data
-  List<MenuItem> getAll() => _box.values.toList();
+  Box<MenuItem> get _box => Hive.box<MenuItem>(HiveService.menuBoxName);
 
-  // Tambah Menu
-  Future<void> addMenu({
-    required String name,
-    required String imagePath,
-    required double price,
-  }) async {
-    final newId =
-        (_box.values.map((e) => e.id).fold<int>(0, (p, c) => c > p ? c : p)) +
-        1;
+  List<MenuItem> getAll() {
+    return _box.values.toList();
+  }
 
-    final item = MenuItem(
-      id: newId,
-      name: name,
-      imagePath: imagePath,
-      price: price,
-    );
+  int getNextId() {
+    if (_box.isEmpty) return 1;
+    final ids = _box.values.map((e) => e.id).toList()..sort();
+    return ids.last + 1;
+  }
 
+  Future<void> addMenu(MenuItem item) async {
     await _box.add(item);
   }
 
-  // Edit Menu
   Future<void> updateMenu(MenuItem item) async {
-    final key = _box.keys.firstWhere((k) => _box.get(k)!.id == item.id);
-    await _box.put(key, item);
+    final key = _box.keys.firstWhere(
+      (k) => _box.get(k)?.id == item.id,
+      orElse: () => null,
+    );
+    if (key != null) {
+      await _box.put(key, item);
+    }
   }
 
-  // Hapus Menu
-  Future<void> deleteMenu(int id) async {
-    final key = _box.keys.firstWhere((k) => _box.get(k)!.id == id);
-    await _box.delete(key);
+  Future<void> deleteMenus(List<int> ids) async {
+    final keysToDelete = _box.keys.where((k) => ids.contains(_box.get(k)?.id));
+    await _box.deleteAll(keysToDelete);
   }
 }
