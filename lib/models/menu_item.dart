@@ -1,36 +1,54 @@
 import 'package:hive/hive.dart';
 
-// ======================
-// MODEL MENU
-// ======================
+/// MODEL MENU
 class MenuItem {
   int id;
   String name;
-  String imagePath;
-  double price;
+  String? imagePath;
+  String description;
+  List<String> persediaan;
+  List<String> mesin;
+  List<String> proses;
 
   MenuItem({
     required this.id,
     required this.name,
-    required this.imagePath,
-    required this.price,
-  });
+    this.imagePath,
+    this.description = '',
+    List<String>? persediaan,
+    List<String>? mesin,
+    List<String>? proses,
+  }) : persediaan = persediaan ?? [],
+       mesin = mesin ?? [],
+       proses = proses ?? [];
 }
 
-// ======================
-// MANUAL ADAPTER
-// ======================
+/// MANUAL ADAPTER HIVE
 class MenuItemAdapter extends TypeAdapter<MenuItem> {
   @override
-  final int typeId = 2;
+  final int typeId = 2; // pastikan belum dipakai adapter lain
 
   @override
   MenuItem read(BinaryReader reader) {
+    final id = reader.readInt();
+    final name = reader.readString();
+
+    final hasImage = reader.readBool();
+    final imagePath = hasImage ? reader.readString() : null;
+
+    final description = reader.readString();
+    final persediaan = reader.readList().cast<String>();
+    final mesin = reader.readList().cast<String>();
+    final proses = reader.readList().cast<String>();
+
     return MenuItem(
-      id: reader.readInt(),
-      name: reader.readString(),
-      imagePath: reader.readString(),
-      price: reader.readDouble(),
+      id: id,
+      name: name,
+      imagePath: imagePath,
+      description: description,
+      persediaan: persediaan,
+      mesin: mesin,
+      proses: proses,
     );
   }
 
@@ -38,7 +56,17 @@ class MenuItemAdapter extends TypeAdapter<MenuItem> {
   void write(BinaryWriter writer, MenuItem obj) {
     writer.writeInt(obj.id);
     writer.writeString(obj.name);
-    writer.writeString(obj.imagePath);
-    writer.writeDouble(obj.price);
+
+    if (obj.imagePath != null) {
+      writer.writeBool(true);
+      writer.writeString(obj.imagePath!);
+    } else {
+      writer.writeBool(false);
+    }
+
+    writer.writeString(obj.description);
+    writer.writeList(obj.persediaan);
+    writer.writeList(obj.mesin);
+    writer.writeList(obj.proses);
   }
 }
