@@ -1,29 +1,132 @@
+import 'dart:io';
+
+import 'package:coffe_mobile_apps/services/menu_services.dart';
 import 'package:flutter/material.dart';
 
-class MenuPage extends StatelessWidget {
+import '../../models/menu_item.dart';
+import 'add_menu_page.dart';
+import 'detail_menu_page.dart';
+
+class MenuPage extends StatefulWidget {
   const MenuPage({super.key});
 
   @override
+  State<MenuPage> createState() => _MenuPageState();
+}
+
+class _MenuPageState extends State<MenuPage> {
+  final TextEditingController _searchC = TextEditingController();
+  final MenuService _menuService = MenuService.instance;
+
+  List<MenuItem> _allMenus = [];
+  List<MenuItem> _filteredMenus = [];
+
+  bool _selectMode = false;
+  final List<int> _selectedIds = [];
+
+  @override
+  void initState() {
+    super.initState();
+    _loadMenus();
+  }
+
+  void _loadMenus() {
+    final menus = _menuService.getAll();
+    setState(() {
+      _allMenus = menus;
+      _applyFilter();
+    });
+  }
+
+  void _applyFilter() {
+    final q = _searchC.text.toLowerCase();
+    if (q.isEmpty) {
+      _filteredMenus = List.from(_allMenus);
+    } else {
+      _filteredMenus =
+          _allMenus.where((m) => m.name.toLowerCase().contains(q)).toList();
+    }
+  }
+
+  void _toggleSelectMode() {
+    setState(() {
+      if (_selectMode) {
+        // keluar dari mode pilih
+        _selectMode = false;
+        _selectedIds.clear();
+      } else {
+        _selectMode = true;
+        _selectedIds.clear();
+      }
+    });
+  }
+
+  Future<void> _deleteSelected() async {
+    if (_selectedIds.isEmpty) {
+      // kalau ga ada yang kepilih, dianggap batal
+      _toggleSelectMode();
+      return;
+    }
+
+    final confirm = await showDialog<bool>(
+      context: context,
+      builder:
+          (_) => AlertDialog(
+            title: const Text('Hapus Menu'),
+            content: const Text('Yakin ingin menghapus menu yang dipilih?'),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context, false),
+                child: const Text('Batal'),
+              ),
+              TextButton(
+                onPressed: () => Navigator.pop(context, true),
+                child: const Text('Hapus'),
+              ),
+            ],
+          ),
+    );
+
+    if (confirm == true) {
+      await _menuService.deleteMenus(_selectedIds);
+      _toggleSelectMode();
+      _loadMenus();
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final maroon = const Color(0xFF5C2A2A);
+
+    final String rightLabel;
+    if (_selectMode && _selectedIds.isNotEmpty) {
+      rightLabel = 'Hapus';
+    } else if (_selectMode) {
+      rightLabel = 'Batalkan';
+    } else {
+      rightLabel = 'Pilih';
+    }
+
     return Scaffold(
       body: Stack(
         children: [
-          SizedBox(
-            width: double.infinity,
-            height: double.infinity,
+          // BG
+          Positioned.fill(
             child: Image.asset(
               'assets/images/bg_coffee_menu.png',
               fit: BoxFit.cover,
             ),
           ),
-
-          Container(color: Colors.black.withOpacity(0.10)),
+          Positioned.fill(
+            child: Container(color: Colors.black.withOpacity(0.10)),
+          ),
 
           SafeArea(
             child: Column(
               children: [
                 const SizedBox(height: 12),
 
+                // Back + Search
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 16),
                   child: Row(
@@ -43,7 +146,6 @@ class MenuPage extends StatelessWidget {
                           ),
                         ),
                       ),
-
                       const SizedBox(width: 12),
                       Expanded(
                         child: Container(
@@ -52,32 +154,32 @@ class MenuPage extends StatelessWidget {
                             color: Colors.white.withOpacity(0.9),
                             borderRadius: BorderRadius.circular(26),
                           ),
-                          child: Material(
-                            color: Colors.transparent,
-                            child: const TextField(
-                              style: TextStyle(
-                                fontFamily: 'Georgia',
-                                fontSize: 16,
-                                color: Colors.black,
+                          child: TextField(
+                            controller: _searchC,
+                            onChanged: (_) {
+                              setState(() => _applyFilter());
+                            },
+                            style: const TextStyle(
+                              fontFamily: 'Georgia',
+                              fontSize: 16,
+                              color: Colors.white,
+                            ),
+                            decoration: const InputDecoration(
+                              border: InputBorder.none,
+                              isCollapsed: true,
+                              prefixIcon: Icon(
+                                Icons.search,
+                                size: 20,
+                                color: Colors.white,
                               ),
-                              decoration: InputDecoration(
-                                border: InputBorder.none,
-                                filled: false,
-                                isCollapsed: true,
-                                prefixIcon: Icon(
-                                  Icons.search,
-                                  size: 20,
-                                  color: Colors.black54,
-                                ),
-                                hintText: "Cari...",
-                                hintStyle: TextStyle(
-                                  fontFamily: 'Georgia',
-                                  color: Colors.black54,
-                                ),
-                                contentPadding: EdgeInsets.symmetric(
-                                  vertical: 10,
-                                  horizontal: 4,
-                                ),
+                              hintText: "Cari...",
+                              hintStyle: TextStyle(
+                                fontFamily: 'Georgia',
+                                color: Colors.white,
+                              ),
+                              contentPadding: EdgeInsets.symmetric(
+                                vertical: 10,
+                                horizontal: 4,
                               ),
                             ),
                           ),
@@ -101,6 +203,7 @@ class MenuPage extends StatelessWidget {
 
                 const SizedBox(height: 20),
 
+                // GRID
                 Expanded(
                   child: Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -113,15 +216,44 @@ class MenuPage extends StatelessWidget {
                             crossAxisSpacing: 18,
                             mainAxisSpacing: 18,
                           ),
-                      itemCount: menuList.length,
+                      itemCount: _filteredMenus.length,
                       itemBuilder: (context, index) {
-                        final item = menuList[index];
-                        return _menuItem(item['image'], item['name']);
+                        final item = _filteredMenus[index];
+                        final isSelected = _selectedIds.contains(item.id);
+
+                        return GestureDetector(
+                          onTap: () async {
+                            if (_selectMode) {
+                              setState(() {
+                                if (isSelected) {
+                                  _selectedIds.remove(item.id);
+                                } else {
+                                  _selectedIds.add(item.id);
+                                }
+                              });
+                            } else {
+                              final changed = await Navigator.push<bool>(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (_) => DetailMenuPage(menu: item),
+                                ),
+                              );
+                              if (changed == true) _loadMenus();
+                            }
+                          },
+                          child: _menuItem(
+                            item,
+                            maroon: maroon,
+                            selectMode: _selectMode,
+                            isSelected: isSelected,
+                          ),
+                        );
                       },
                     ),
                   ),
                 ),
 
+                // Bottom row: Tambah / Pilih-Hapus-Batalkan
                 Padding(
                   padding: const EdgeInsets.symmetric(
                     horizontal: 20,
@@ -129,21 +261,43 @@ class MenuPage extends StatelessWidget {
                   ),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: const [
-                      Text(
-                        "Tambah",
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontFamily: 'Georgia',
-                          fontSize: 15,
+                    children: [
+                      GestureDetector(
+                        onTap: () async {
+                          final added = await Navigator.push<bool>(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => const AddMenuPage(),
+                            ),
+                          );
+                          if (added == true) _loadMenus();
+                        },
+                        child: const Text(
+                          "Tambah",
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontFamily: 'Georgia',
+                            fontSize: 15,
+                          ),
                         ),
                       ),
-                      Text(
-                        "Pilih",
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontFamily: 'Georgia',
-                          fontSize: 15,
+                      GestureDetector(
+                        onTap: () {
+                          if (_selectMode && _selectedIds.isNotEmpty) {
+                            _deleteSelected();
+                          } else if (_selectMode && _selectedIds.isEmpty) {
+                            _toggleSelectMode();
+                          } else {
+                            _toggleSelectMode();
+                          }
+                        },
+                        child: Text(
+                          rightLabel,
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontFamily: 'Georgia',
+                            fontSize: 15,
+                          ),
                         ),
                       ),
                     ],
@@ -157,38 +311,69 @@ class MenuPage extends StatelessWidget {
     );
   }
 
-  Widget _menuItem(String img, String name) {
+  Widget _menuItem(
+    MenuItem item, {
+    required Color maroon,
+    required bool selectMode,
+    required bool isSelected,
+  }) {
     return Container(
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(22),
       ),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
+      child: Stack(
         children: [
-          Image.asset(img, width: 82, height: 82, fit: BoxFit.contain),
-          const SizedBox(height: 10),
-          Text(
-            name,
-            style: const TextStyle(
-              fontFamily: 'Georgia',
-              fontSize: 16,
-              color: Colors.black,
+          // konten utama
+          Center(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                if (item.imagePath != null && item.imagePath!.isNotEmpty)
+                  Image.file(
+                    File(item.imagePath!),
+                    width: 82,
+                    height: 82,
+                    fit: BoxFit.contain,
+                  )
+                else
+                  Image.asset(
+                    "assets/menu/espresso.png", // default (bebas)
+                    width: 82,
+                    height: 82,
+                    fit: BoxFit.contain,
+                  ),
+                const SizedBox(height: 10),
+                Text(
+                  item.name,
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(
+                    fontFamily: 'Georgia',
+                    fontSize: 16,
+                    color: Colors.black,
+                  ),
+                ),
+              ],
             ),
           ),
+
+          // kotak merah / putih di pojok kiri atas saat selectMode
+          if (selectMode)
+            Positioned(
+              top: 8,
+              left: 8,
+              child: Container(
+                width: 18,
+                height: 18,
+                decoration: BoxDecoration(
+                  color: isSelected ? Colors.red : Colors.white,
+                  borderRadius: BorderRadius.circular(4),
+                  border: Border.all(color: Colors.black, width: 1),
+                ),
+              ),
+            ),
         ],
       ),
     );
   }
 }
-
-final List<Map<String, dynamic>> menuList = [
-  {"image": "assets/menu/espresso.png", "name": "Espresso"},
-  {"image": "assets/menu/americano.png", "name": "Americano"},
-  {"image": "assets/menu/cappuccino.png", "name": "Cappuccino"},
-  {"image": "assets/menu/caramel_latte.png", "name": "Caramel Latte"},
-  {"image": "assets/menu/mochaccino.png", "name": "Mochaccino"},
-  {"image": "assets/menu/hot_chocolate.png", "name": "Hot Chocolate"},
-  {"image": "assets/menu/aren_latte.png", "name": "Aren Latte"},
-  {"image": "assets/menu/honey_milk_latte.png", "name": "Honey Milk Latte"},
-];
